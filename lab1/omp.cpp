@@ -13,12 +13,12 @@ void GemmParallel(const float a[kI][kK], const float b[kK][kJ],
  int nCores=omp_get_max_threads();
  omp_set_num_threads(nCores);
 
- #pragma omp parallel for private(i)
+ 
    for (int i = 0; i < kI; ++i) {
     std::memset(c[i], 0, sizeof(float) * kJ);
   }
 
-  #pragma omp parallel for private(k,j,temp) schedule(guided)
+  #pragma omp parallel for shared(c,temp,b) private(i,j,k) schedule(guided)
   for (int i = 0; i < kI; ++i) {
     for (int k = 0; k < kK; ++k) {
       temp=a[i][k];
