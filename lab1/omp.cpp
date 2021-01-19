@@ -1,4 +1,3 @@
-// Header inclusions, if any...
 #include <cstring>
 #include "lib/gemm.h"
 #include <omp.h>
@@ -13,7 +12,7 @@ void GemmParallel(const float a[kI][kK], const float b[kK][kJ],
  int nCores=omp_get_max_threads();
  omp_set_num_threads(nCores);
 
- 
+  #pragma omp parallel for
    for (int i = 0; i < kI; ++i) {
     std::memset(c[i], 0, sizeof(float) * kJ);
   }
