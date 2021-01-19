@@ -10,7 +10,7 @@ void GemmParallel(const float a[kI][kK], const float b[kK][kJ],
   float temp;
   int i, j, k;
  //int nCores=omp_get_max_threads();
- omp_set_num_threads(64);
+ omp_set_num_threads(128);
    for (int i = 0; i < kI; ++i) {
     std::memset(c[i], 0, sizeof(float) * kJ);
   }
