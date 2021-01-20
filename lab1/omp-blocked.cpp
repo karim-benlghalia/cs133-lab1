@@ -15,11 +15,11 @@ void GemmParallelBlocked(const float a[kI][kK], const float b[kK][kJ],
   int i_blocks = kI / blocking_size;
   int j_blocks = kJ / blocking_size;
 
-#pragma omp parallel for private(i, j, k, bi, bj) schedule(static, 16)
+
 
   for (i = 0; i < i_blocks; i++)
   {
-
+#pragma omp parallel for private(i, j, k, bi, bj) schedule(static, 16)
     for (j = 0; j < j_blocks; j++)
     {
 
