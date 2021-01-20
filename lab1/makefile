@@ -19,5 +19,7 @@ gemm: $(SRCS)
 
 clean:
 	$(RM) gemm
+delete: 
+	$(RM) submission.zip
 
 include ../common/makefile.inc
