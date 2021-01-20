@@ -11,15 +11,21 @@ void GemmParallelBlocked(const float a[kI][kK], const float b[kK][kJ],
   int nCores = omp_get_max_threads();
   omp_set_num_threads(nCores);
   int i, j, k;
-  int bi, bj, bk;
+  int b_i, b_j, b_k;
   int i_blocks = kI / blocking_size;
   int j_blocks = kJ / blocking_size;
 
 
+#pragma omp parallel for private(i)
+  for (int i = 0; i < kI; ++i)
+  {
+    std::memset(c[i], 0, sizeof(float) * kJ);
+  }
 
+#pragma omp parallel for private(i, j, k, b_i, b_j) schedule(static, 16)
   for (i = 0; i < i_blocks; i++)
   {
-#pragma omp parallel for private(i, j, k, bi, bj) schedule(static, 16)
+
     for (j = 0; j < j_blocks; j++)
     {
 
@@ -28,20 +34,13 @@ void GemmParallelBlocked(const float a[kI][kK], const float b[kK][kJ],
 
       for (k = 0; k < kK; k++)
       {
-        for (bi = 0; bi < blocking_size; bi++)
+        for (b_i = 0; b_i < blocking_size; b_i++)
         {
-          for (bj = 0; bj < blocking_size; bj++)
+          for (b_j = 0; b_j < blocking_size; b_j++)
           {
-            temp[bi][bj] += a[i * blocking_size + bi][k] * b[k][j * blocking_size + bj];
+            temp[b_i][b_j] += a[i * blocking_size + b_i][k] * b[k][j * blocking_size + b_j];
+             c[i * blocking_size + b_i][j * blocking_size + b_j] = temp[b_i][b_j];
           }
-        }
-      }
-
-      for (bi = 0; bi < blocking_size; bi++)
-      {
-        for (bj = 0; bj < blocking_size; bj++)
-        {
-          c[i * blocking_size + bi][j * blocking_size + bj] = temp[bi][bj];
         }
       }
     }
