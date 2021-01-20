@@ -1,60 +1,56 @@
+
 // Header inclusions, if any...
 #include <omp.h>
 #include "lib/gemm.h"
 #include <cstring>
 // Using declarations, if any...
-#define blocking_size 32
+#define blocking_size 64
 void GemmParallelBlocked(const float a[kI][kK], const float b[kK][kJ],
                          float c[kI][kJ])
 {
-  
+
   int nCores = omp_get_max_threads();
   omp_set_num_threads(nCores);
-  int i, j, k;
-  int b_i, b_j, b_k;
-  int i_blocks = kI / blocking_size;
-  int j_blocks = kJ / blocking_size;
+  
+  float temp_buff2[blocking_size][blocking_size] = {0};
 
-
-#pragma omp parallel for private(i)
-  for (int i = 0; i < kI; ++i)
+ 
+ float temp;
+  #pragma omp parallel for private(temp) schedule(static, 8)
+  for (int b_i = 0; b_i < kI; b_i += blocking_size)
   {
-    std::memset(c[i], 0, sizeof(float) * kJ);
-  }
-
-#pragma omp parallel for private(i, j, k, b_i, b_j) schedule(static, 16)
-  for (i = 0; i < i_blocks; i++)
-  {
-
-    for (j = 0; j < j_blocks; j++)
+    for (int b_j = 0; b_j < kJ; b_j += blocking_size)
     {
-
-      float temp[blocking_size][blocking_size];
-      memset(temp, 0, sizeof(float) * blocking_size * blocking_size);
-
-      for (k = 0; k < kK; k++)
+     
+    float temp_buff[blocking_size][blocking_size] = {0};
+    
+      for (int b_k = 0; b_k < kK; b_k += blocking_size)
       {
-        for (b_i = 0; b_i < blocking_size; b_i++)
+        
+        for (int i = b_i; i < ((b_i + blocking_size) > kI ? kI : (b_i + blocking_size)); i++)
         {
-          int indexI = i * blocking_size + b_i;
-          for (b_j = 0; b_j < blocking_size; b_j++)
+          int indexI = i - b_i;
+          int indexJ=0;
+          for (int k = b_k; k < ((b_k + blocking_size) > kK ? kK : (b_k + blocking_size)); k++)
           {
-            int indexJ = j * blocking_size + b_j;
-            temp[b_i][b_j] += a[indexI][k] * b[k][indexJ ];
-             
+            temp = a[i][k];
+            for (int j = b_j; j < ((b_j + blocking_size) > kJ ? kJ : (b_j + blocking_size)); j++)
+            {
+              indexJ = j - b_j;
+              temp_buff[indexI][indexJ] += temp * b[k][j];
+             // temp_buff2[indexI][indexJ] += temp * b[k][j]; 
+            }
+
           }
         }
       }
-
-        for (b_i = 0; b_i < blocking_size; b_i++)
-      {
-         int indexI = i * blocking_size + b_i;
-        for (b_j = 0; b_j < blocking_size; b_j++)
-        {
-          int indexJ = j * blocking_size + b_j;
-          c[indexI][indexJ] = temp[b_i][b_j];
-        }
-      }
+      //memcpy ( &temp_buff2, &temp_buff, sizeof(temp_buff) );
+     //&temp_buff2 = &temp_buff;
+     #pragma omp parallel for schedule(static, 8)
+      for (int i = 0; i < blocking_size; i++)
+      { int indexI = b_i + i;
+        memcpy(&c[indexI][b_j], &temp_buff[i][0], sizeof(float) * blocking_size);}
     }
   }
+  
 }
