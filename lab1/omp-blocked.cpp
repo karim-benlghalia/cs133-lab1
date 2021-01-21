@@ -26,7 +26,7 @@ void GemmParallelBlocked(const float a[kI][kK], const float b[kK][kJ],
     
       for (int b_k = 0; b_k < kK; b_k += blocking_size)
       {
-        #pragma omp parallel for
+        #pragma omp parallel for schedule(static)
         for (int i = b_i; i < ((b_i + blocking_size) > kI ? kI : (b_i + blocking_size)); i++)
         {
           int indexI = i - b_i;
@@ -46,7 +46,7 @@ void GemmParallelBlocked(const float a[kI][kK], const float b[kK][kJ],
       }
       //memcpy ( &temp_buff2, &temp_buff, sizeof(temp_buff) );
      //&temp_buff2 = &temp_buff;
-     #pragma omp parallel for 
+     #pragma omp parallel for schedule(static)
       for (int i = 0; i < blocking_size; i++)
       { int indexI = b_i + i;
         memcpy(&c[indexI][b_j], &temp_buff[i][0], sizeof(float) * blocking_size);}
