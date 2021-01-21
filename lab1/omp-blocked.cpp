@@ -4,7 +4,7 @@
 #include "lib/gemm.h"
 #include <cstring>
 // Using declarations, if any...
-#define blocking_size 64
+#define blocking_size 128
 void GemmParallelBlocked(const float a[kI][kK], const float b[kK][kJ],
                          float c[kI][kJ])
 {
@@ -27,7 +27,8 @@ void GemmParallelBlocked(const float a[kI][kK], const float b[kK][kJ],
       for (int b_k = 0; b_k < kK; b_k += blocking_size)
       {
         #pragma omp parallel for schedule(static)
-        for (int i = b_i; i < ((b_i + blocking_size) > kI ? kI : (b_i + blocking_size)); i++)
+        
+        for (int i = b_i; i < ((b_i + blocking_size)); i++)
         {
           int indexI = i - b_i;
           int indexJ=0;

@@ -26,6 +26,7 @@ void GemmParallel(const float a[kI][kK], const float b[kK][kJ],
     for (int k = 0; k < kK; ++k)
     {
       temp = a[i][k];
+      float sum = 0.0;
       for (int j = 0; j < kJ; ++j)
       {
         c[i][j] += temp * b[k][j];
