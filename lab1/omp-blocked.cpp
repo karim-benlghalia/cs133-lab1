@@ -31,10 +31,10 @@ void GemmParallelBlocked(const float a[kI][kK], const float b[kK][kJ],
         {
           int indexI = i - b_i;
           int indexJ=0;
-          for (int k = b_k; k < ((b_k + blocking_size)); k++)
+          for (int k = b_k; k < ((b_k + blocking_size)> kK ? kK : (b_k + blocking_size) ); k++)
           {
             temp = a[i][k];
-            for (int j = b_j; j < ((b_j + blocking_size)); j++)
+            for (int j = b_j; j < ((b_j + blocking_size) > kJ ? kJ : (b_j + blocking_size)); j++)
             {
               indexJ = j - b_j;
               temp_buff[indexI][indexJ] += temp * b[k][j];
