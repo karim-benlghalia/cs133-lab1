@@ -4,7 +4,7 @@
 #include "lib/gemm.h"
 #include <cstring>
 // Using declarations, if any...
-#define blocking_size 128
+#define blocking_size 64
 void GemmParallelBlocked(const float a[kI][kK], const float b[kK][kJ],
                          float c[kI][kJ])
 {
