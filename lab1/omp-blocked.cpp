@@ -26,8 +26,6 @@ int i,j,k;
     
       for (int b_k = 0; b_k < kK; b_k += blocking_size)
       {
-
-       #pragma omp parallel for schedule(static, 8)
         for (i = b_i; i < ((b_i + blocking_size)); i++)
         {
           int indexI = i - b_i;
@@ -47,7 +45,7 @@ int i,j,k;
       }
       //memcpy ( &temp_buff2, &temp_buff, sizeof(temp_buff) );
      //&temp_buff2 = &temp_buff;
-     //#pragma omp parallel for schedule(static)
+     #pragma omp parallel for schedule(static, 8)
       for (int i = 0; i < blocking_size; i++)
       { int indexI = b_i + i;
         memcpy(&c[indexI][b_j], &temp_buff[i][0], sizeof(float) * blocking_size);}
