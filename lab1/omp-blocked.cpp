@@ -53,10 +53,10 @@ int i,j,k;
       //memcpy ( &temp_buff2, &temp_buff, sizeof(temp_buff) );
      //&temp_buff2 = &temp_buff;
      #pragma omp parallel for schedule(static, 8)
-      for (int i = 0; i < blocking_size; i++)
+      for (int p = 0; p < blocking_size; p++)
       { 
         int indexI = b_i + i;
-        memmove(&c[indexI][b_j], &temp_buff[i][0], sizeof(float) * blocking_size);}
+        memmove(&c[indexI][b_j], &temp_buff[p][0], sizeof(float) * blocking_size);}
     }
   }
   
