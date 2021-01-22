@@ -22,6 +22,7 @@ int i,j,k;
   }
 
  float temp;
+
   #pragma omp parallel for private(i, j, k, temp) schedule(static, 8)
   for (int b_i = 0; b_i < kI; b_i += blocking_size)
   { 
@@ -55,7 +56,7 @@ int i,j,k;
       for (int i = 0; i < blocking_size; i++)
       { 
         int indexI = b_i + i;
-        memcpy(&c[indexI][b_j], &temp_buff[i][0], sizeof(float) * blocking_size);}
+        memmove(&c[indexI][b_j], &temp_buff[i][0], sizeof(float) * blocking_size);}
     }
   }
   
