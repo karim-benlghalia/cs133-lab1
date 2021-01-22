@@ -10,7 +10,7 @@ void GemmParallelBlocked(const float a[kI][kK], const float b[kK][kJ],
 {
 int i,j,k;
   int nCores = omp_get_max_threads();
-  omp_set_num_threads(8);
+  omp_set_num_threads(16);
   
   float temp_buff2[blocking_size][blocking_size] = {0};
 
